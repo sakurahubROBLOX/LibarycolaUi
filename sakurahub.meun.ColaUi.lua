@@ -57,17 +57,36 @@ function colaUi.new(title, currentTheme)
     MainCorner.CornerRadius = UDim.new(0, 8)
     MainCorner.Parent = self.MainFrame
 
-    -- Кнопка закрытия (-) в правом верхнем углу меню
+    -- Верхняя шапка (для перетаскивания и заголовка)
+    local TopBar = Instance.new("Frame")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.BackgroundTransparency = 1
+    TopBar.Parent = self.MainFrame
+
+    -- Заголовок меню
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -50, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = title
+    TitleLabel.TextColor3 = self.Theme.Text
+    TitleLabel.Font = Enum.Font.SourceSansBold
+    TitleLabel.TextSize = 16
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Parent = TopBar
+
+    -- Кнопка закрытия (-) в правом верхнем углу шапки
     local CloseButton = Instance.new("TextButton")
     CloseButton.Name = "CloseButton"
-    CloseButton.Size = UDim2.new(0, 30, 0, 30)
-    CloseButton.Position = UDim2.new(1, -35, 0, 5)
+    CloseButton.Size = UDim2.new(0, 28, 0, 28)
+    CloseButton.Position = UDim2.new(1, -34, 0, 6)
     CloseButton.BackgroundColor3 = self.Theme.Sidebar
     CloseButton.Text = "-"
     CloseButton.TextColor3 = self.Theme.Text
     CloseButton.Font = Enum.Font.SourceSansBold
     CloseButton.TextSize = 18
-    CloseButton.Parent = self.MainFrame
+    CloseButton.Parent = TopBar
 
     local CloseCorner = Instance.new("UICorner")
     CloseCorner.CornerRadius = UDim.new(0, 6)
@@ -83,7 +102,7 @@ function colaUi.new(title, currentTheme)
     OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     OpenButton.Font = Enum.Font.SourceSansBold
     OpenButton.TextSize = 12
-    OpenButton.Visible = false -- Изначально меню открыто, значит кнопка открытия скрыта
+    OpenButton.Visible = false
     OpenButton.Parent = self.ScreenGui
 
     local OpenCorner = Instance.new("UICorner")
@@ -101,7 +120,7 @@ function colaUi.new(title, currentTheme)
         OpenButton.Visible = false
     end)
 
-    -- Боковая панель для вкладок
+    -- Боковая панель для вкладок (начинается ниже шапки)
     self.Sidebar = Instance.new("ScrollingFrame")
     self.Sidebar.Name = "Sidebar"
     self.Sidebar.Size = UDim2.new(0, 140, 1, -45)
@@ -115,18 +134,6 @@ function colaUi.new(title, currentTheme)
     SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
     SidebarLayout.Padding = UDim.new(0, 5)
     SidebarLayout.Parent = self.Sidebar
-
-    -- Заголовок меню
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -45, 0, 35)
-    TitleLabel.Position = UDim2.new(0, 10, 0, 5)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = title
-    TitleLabel.TextColor3 = self.Theme.Text
-    TitleLabel.Font = Enum.Font.SourceSansBold
-    TitleLabel.TextSize = 16
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Parent = self.MainFrame
 
     self.PagesContainer = Instance.new("Folder")
     self.PagesContainer.Name = "PagesContainer"
@@ -195,7 +202,7 @@ function colaUi:CreateTab(name)
 
         local Corner = Instance.new("UICorner")
 
-        if shape == "circle"  then
+        if shape == "circle" then
             Button.Size = UDim2.new(0, 40, 0, 40)
             Corner.CornerRadius = UDim.new(1, 0)
         elseif shape == "square" then
