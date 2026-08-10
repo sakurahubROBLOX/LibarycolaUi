@@ -36,14 +36,15 @@ function colaUi.new(title, currentTheme)
     local self = setmetatable({}, colaUi)
     self.Theme = colaUi.Themes[currentTheme] or colaUi.Themes.Rose
     
-    if game:GetService("CoreGui"):FindFirstChild("ColaCheatUI") then
-        game:GetService("CoreGui").ColaCheatUI:Destroy()
+    if game:GetService("CoreGui"):FindFirstChild("ColaTestUi") then
+        game:GetService("CoreGui").ColaTestUi:Destroy()
     end
 
     self.ScreenGui = Instance.new("ScreenGui")
-    self.ScreenGui.Name = "ColaCheatUI"
+    self.ScreenGui.Name = "ColaTestUi"
     self.ScreenGui.Parent = game:GetService("CoreGui")
 
+    -- Главное окно
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
     self.MainFrame.Size = UDim2.new(0, 550, 0, 350)
@@ -56,28 +57,81 @@ function colaUi.new(title, currentTheme)
     MainCorner.CornerRadius = UDim.new(0, 8)
     MainCorner.Parent = self.MainFrame
 
+    -- Кнопка закрытия (-) в правом верхнем углу меню
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Name = "CloseButton"
+    CloseButton.Size = UDim2.new(0, 30, 0, 30)
+    CloseButton.Position = UDim2.new(1, -35, 0, 5)
+    CloseButton.BackgroundColor3 = self.Theme.Sidebar
+    CloseButton.Text = "-"
+    CloseButton.TextColor3 = self.Theme.Text
+    CloseButton.Font = Enum.Font.SourceSansBold
+    CloseButton.TextSize = 18
+    CloseButton.Parent = self.MainFrame
+
+    local CloseCorner = Instance.new("UICorner")
+    CloseCorner.CornerRadius = UDim.new(0, 6)
+    CloseCorner.Parent = CloseButton
+
+    -- Круглая кнопка на экране для открытия меню обратно
+    local OpenButton = Instance.new("TextButton")
+    OpenButton.Name = "OpenButton"
+    OpenButton.Size = UDim2.new(0, 45, 0, 45)
+    OpenButton.Position = UDim2.new(0, 20, 0.5, -22)
+    OpenButton.BackgroundColor3 = self.Theme.Accent
+    OpenButton.Text = "Cola"
+    OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    OpenButton.Font = Enum.Font.SourceSansBold
+    OpenButton.TextSize = 12
+    OpenButton.Visible = false -- Изначально меню открыто, значит кнопка открытия скрыта
+    OpenButton.Parent = self.ScreenGui
+
+    local OpenCorner = Instance.new("UICorner")
+    OpenCorner.CornerRadius = UDim.new(1, 0)
+    OpenCorner.Parent = OpenButton
+
+    -- Логика сворачивания/разворачивания
+    CloseButton.MouseButton1Click:Connect(function()
+        self.MainFrame.Visible = false
+        OpenButton.Visible = true
+    end)
+
+    OpenButton.MouseButton1Click:Connect(function()
+        self.MainFrame.Visible = true
+        OpenButton.Visible = false
+    end)
+
+    -- Боковая панель для вкладок
     self.Sidebar = Instance.new("ScrollingFrame")
     self.Sidebar.Name = "Sidebar"
-    self.Sidebar.Size = UDim2.new(0, 140, 1, 0)
+    self.Sidebar.Size = UDim2.new(0, 140, 1, -45)
+    self.Sidebar.Position = UDim2.new(0, 0, 0, 40)
     self.Sidebar.BackgroundColor3 = self.Theme.Sidebar
     self.Sidebar.BorderSizePixel = 0
     self.Sidebar.ScrollBarThickness = 2
     self.Sidebar.Parent = self.MainFrame
-
-    local SidebarCorner = Instance.new("UICorner")
-    SidebarCorner.CornerRadius = UDim.new(0, 8)
-    SidebarCorner.Parent = self.Sidebar
 
     local SidebarLayout = Instance.new("UIListLayout")
     SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
     SidebarLayout.Padding = UDim.new(0, 5)
     SidebarLayout.Parent = self.Sidebar
 
+    -- Заголовок меню
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -45, 0, 35)
+    TitleLabel.Position = UDim2.new(0, 10, 0, 5)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = title
+    TitleLabel.TextColor3 = self.Theme.Text
+    TitleLabel.Font = Enum.Font.SourceSansBold
+    TitleLabel.TextSize = 16
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Parent = self.MainFrame
+
     self.PagesContainer = Instance.new("Folder")
     self.PagesContainer.Name = "PagesContainer"
     self.PagesContainer.Parent = self.MainFrame
 
-    self.TabsCount = 0
     self.FirstTab = true
 
     return self
@@ -89,7 +143,6 @@ function colaUi:CreateTab(name)
 
     local TabButton = Instance.new("TextButton")
     TabButton.Size = UDim2.new(1, -10, 0, 35)
-    TabButton.Position = UDim2.new(0, 5, 0, 0)
     TabButton.BackgroundColor3 = self.FirstTab and self.Theme.Accent or self.Theme.Sidebar
     TabButton.TextColor3 = self.Theme.Text
     TabButton.Text = name
@@ -103,8 +156,8 @@ function colaUi:CreateTab(name)
 
     local Page = Instance.new("ScrollingFrame")
     Page.Name = name .. "Page"
-    Page.Size = UDim2.new(1, -155, 1, -10)
-    Page.Position = UDim2.new(0, 150, 0, 5)
+    Page.Size = UDim2.new(1, -155, 1, -50)
+    Page.Position = UDim2.new(0, 150, 0, 45)
     Page.BackgroundTransparency = 1
     Page.Visible = self.FirstTab
     Page.BorderSizePixel = 0
@@ -142,7 +195,7 @@ function colaUi:CreateTab(name)
 
         local Corner = Instance.new("UICorner")
 
-        if shape == "circle" then
+        if shape == "circle"  then
             Button.Size = UDim2.new(0, 40, 0, 40)
             Corner.CornerRadius = UDim.new(1, 0)
         elseif shape == "square" then
@@ -167,4 +220,3 @@ function colaUi:CreateTab(name)
 end
 
 return colaUi
-
