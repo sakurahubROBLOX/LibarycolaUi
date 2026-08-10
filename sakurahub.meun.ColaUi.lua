@@ -3,32 +3,36 @@ colaUi.__index = colaUi
 
 colaUi.Themes = {
     Rose = {
-        Background = Color3.fromRGB(30, 20, 25),
-        Sidebar = Color3.fromRGB(40, 25, 32),
+        Background = Color3.fromRGB(24, 18, 22),
+        Sidebar = Color3.fromRGB(32, 22, 28),
         Accent = Color3.fromRGB(255, 105, 180),
         Text = Color3.fromRGB(255, 255, 255),
-        SecondaryText = Color3.fromRGB(180, 160, 170)
+        SecondaryText = Color3.fromRGB(170, 150, 160),
+        Notification = Color3.fromRGB(40, 25, 35)
     },
     Red = {
-        Background = Color3.fromRGB(20, 20, 20),
-        Sidebar = Color3.fromRGB(30, 22, 22),
+        Background = Color3.fromRGB(18, 18, 18),
+        Sidebar = Color3.fromRGB(26, 20, 20),
         Accent = Color3.fromRGB(255, 50, 50),
         Text = Color3.fromRGB(255, 255, 255),
-        SecondaryText = Color3.fromRGB(170, 160, 160)
+        SecondaryText = Color3.fromRGB(160, 150, 150),
+        Notification = Color3.fromRGB(30, 22, 22)
     },
     Blue = {
-        Background = Color3.fromRGB(15, 20, 30),
-        Sidebar = Color3.fromRGB(22, 30, 42),
+        Background = Color3.fromRGB(13, 18, 26),
+        Sidebar = Color3.fromRGB(18, 25, 36),
         Accent = Color3.fromRGB(50, 150, 255),
         Text = Color3.fromRGB(255, 255, 255),
-        SecondaryText = Color3.fromRGB(160, 170, 180)
+        SecondaryText = Color3.fromRGB(150, 160, 170),
+        Notification = Color3.fromRGB(20, 28, 40)
     },
     Green = {
-        Background = Color3.fromRGB(15, 25, 20),
-        Sidebar = Color3.fromRGB(22, 35, 28),
+        Background = Color3.fromRGB(13, 22, 18),
+        Sidebar = Color3.fromRGB(18, 30, 24),
         Accent = Color3.fromRGB(50, 255, 120),
         Text = Color3.fromRGB(255, 255, 255),
-        SecondaryText = Color3.fromRGB(160, 180, 170)
+        SecondaryText = Color3.fromRGB(150, 170, 160),
+        Notification = Color3.fromRGB(20, 35, 28)
     }
 }
 
@@ -44,6 +48,20 @@ function colaUi.new(title, currentTheme)
     self.ScreenGui.Name = "ColaTestUi"
     self.ScreenGui.Parent = game:GetService("CoreGui")
 
+    -- Контейнер для уведомлений (в стиле WindUI справа сверху)
+    self.NotifContainer = Instance.new("Frame")
+    self.NotifContainer.Name = "NotifContainer"
+    self.NotifContainer.Size = UDim2.new(0, 250, 1, 0)
+    self.NotifContainer.Position = UDim2.new(1, -260, 0, 20)
+    self.NotifContainer.BackgroundTransparency = 1
+    self.NotifContainer.Parent = self.ScreenGui
+
+    local NotifLayout = Instance.new("UIListLayout")
+    NotifLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    NotifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    NotifLayout.Padding = UDim.new(0, 10)
+    NotifLayout.Parent = self.NotifContainer
+
     -- Главное окно
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
@@ -54,10 +72,10 @@ function colaUi.new(title, currentTheme)
     self.MainFrame.Parent = self.ScreenGui
 
     local MainCorner = Instance.new("UICorner")
-    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.CornerRadius = UDim.new(0, 10)
     MainCorner.Parent = self.MainFrame
 
-    -- Верхняя шапка (для перетаскивания и заголовка)
+    -- Верхняя шапка
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 40)
@@ -67,7 +85,7 @@ function colaUi.new(title, currentTheme)
     -- Заголовок меню
     local TitleLabel = Instance.new("TextLabel")
     TitleLabel.Size = UDim2.new(1, -50, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = title
     TitleLabel.TextColor3 = self.Theme.Text
@@ -76,9 +94,8 @@ function colaUi.new(title, currentTheme)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = TopBar
 
-    -- Кнопка закрытия (-) в правом верхнем углу шапки
+    -- Кнопка закрытия (-)
     local CloseButton = Instance.new("TextButton")
-    CloseButton.Name = "CloseButton"
     CloseButton.Size = UDim2.new(0, 28, 0, 28)
     CloseButton.Position = UDim2.new(1, -34, 0, 6)
     CloseButton.BackgroundColor3 = self.Theme.Sidebar
@@ -92,9 +109,8 @@ function colaUi.new(title, currentTheme)
     CloseCorner.CornerRadius = UDim.new(0, 6)
     CloseCorner.Parent = CloseButton
 
-    -- Круглая кнопка на экране для открытия меню обратно
+    -- Круглая кнопка открытия (Cola)
     local OpenButton = Instance.new("TextButton")
-    OpenButton.Name = "OpenButton"
     OpenButton.Size = UDim2.new(0, 45, 0, 45)
     OpenButton.Position = UDim2.new(0, 20, 0.5, -22)
     OpenButton.BackgroundColor3 = self.Theme.Accent
@@ -109,7 +125,6 @@ function colaUi.new(title, currentTheme)
     OpenCorner.CornerRadius = UDim.new(1, 0)
     OpenCorner.Parent = OpenButton
 
-    -- Логика сворачивания/разворачивания
     CloseButton.MouseButton1Click:Connect(function()
         self.MainFrame.Visible = false
         OpenButton.Visible = true
@@ -120,7 +135,7 @@ function colaUi.new(title, currentTheme)
         OpenButton.Visible = false
     end)
 
-    -- Боковая панель для вкладок (начинается ниже шапки)
+    -- Боковая панель
     self.Sidebar = Instance.new("ScrollingFrame")
     self.Sidebar.Name = "Sidebar"
     self.Sidebar.Size = UDim2.new(0, 140, 1, -45)
@@ -142,6 +157,60 @@ function colaUi.new(title, currentTheme)
     self.FirstTab = true
 
     return self
+end
+
+-- Функция создания красивых уведомлений в стиле WindUI
+function colaUi:Notify(titleText, descText, duration)
+    duration = duration or 3
+    
+    local Notif = Instance.new("Frame")
+    Notif.Size = UDim2.new(1, 0, 0, 60)
+    Notif.BackgroundColor3 = self.Theme.Notification
+    Notif.BorderSizePixel = 0
+    Notif.Parent = self.NotifContainer
+
+    local NotifCorner = Instance.new("UICorner")
+    NotifCorner.CornerRadius = UDim.new(0, 8)
+    NotifCorner.Parent = Notif
+
+    -- Акцентная полоска слева
+    local AccentLine = Instance.new("Frame")
+    AccentLine.Size = UDim2.new(0, 4, 1, 0)
+    AccentLine.BackgroundColor3 = self.Theme.Accent
+    AccentLine.BorderSizePixel = 0
+    AccentLine.Parent = Notif
+
+    local LineCorner = Instance.new("UICorner")
+    LineCorner.CornerRadius = UDim.new(0, 2)
+    LineCorner.Parent = AccentLine
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, -20, 0, 22)
+    Title.Position = UDim2.new(0, 12, 0, 8)
+    Title.BackgroundTransparency = 1
+    Title.Text = titleText
+    Title.TextColor3 = self.Theme.Text
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 14
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = Notif
+
+    local Desc = Instance.new("TextLabel")
+    Desc.Size = UDim2.new(1, -20, 0, 20)
+    Desc.Position = UDim2.new(0, 12, 0, 30)
+    Desc.BackgroundTransparency = 1
+    Desc.Text = descText
+    Desc.TextColor3 = self.Theme.SecondaryText
+    Desc.Font = Enum.Font.SourceSans
+    Desc.TextSize = 12
+    Desc.TextXAlignment = Enum.TextXAlignment.Left
+    Desc.Parent = Notif
+
+    -- Авто-удаление уведомления через время
+    task.spawn(function()
+        task.wait(duration)
+        Notif:Destroy()
+    end)
 end
 
 function colaUi:CreateTab(name)
@@ -227,3 +296,4 @@ function colaUi:CreateTab(name)
 end
 
 return colaUi
+
